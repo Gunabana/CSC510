@@ -8,8 +8,8 @@ def test_execute_validInput(capsys):
     assert actual == expected
     # assert execute('N') == "Okay, that is smart. Shutting down."
 
-# def test_execute_invaldInput(): # crashes program
-#     assert execute('l') ==  "This Should Fail"
+def test_execute_invaldInput(): # crashes program
+    assert execute('l') ==  "This Should Fail"
 
 
 
