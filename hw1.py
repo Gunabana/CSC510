@@ -10,4 +10,3 @@ def execute(inp):
 if __name__ == "__main__":
     print("Hey, I heard you want to download a virus!")
     execute(input("Do you want a virus? (Y/n)\n>"))
-    # execute(inp)
