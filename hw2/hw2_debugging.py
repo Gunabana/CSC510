@@ -41,7 +41,6 @@ def recombine(left_arr, right_arr):
 
 
 array = rand.random_array([None] * 20)
-# array = rand.random_array(20)
 arr_out = merge_sort(array)
 
 print(arr_out)
