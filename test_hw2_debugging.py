@@ -1,5 +1,4 @@
 """Import the pytest suite"""
-import pytest
 from hw2_debugging import merge_sort
 
 def test_single_value():
@@ -11,4 +10,5 @@ def test_two_values():
     assert merge_sort([2, 1]) == [1, 2]
 
 def test_long_array():
+    """Test a long array"""
     assert merge_sort([21, 48, 21, 2, 0, 4, -3, 100]) == [-3, 0, 2, 4, 21, 21, 48, 100]
