@@ -32,7 +32,7 @@ jobs:
     - name: Measure complexity with radon
       run: radon mi *.py
     - name: Lint code with Pylint
-      run: pylint $(find . -type f -name "*.py" ! -name "test*.py")
+      run: pylint $(find . -type f -name "*.py" ! -name "test*.py") --ignore=previous-homeworks
     - name: Test with pytest
       run: |
         pip install pytest pytest-cov
