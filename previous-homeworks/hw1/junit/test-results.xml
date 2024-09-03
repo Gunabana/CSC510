@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="0.043" timestamp="2024-08-20T20:44:17.409861+00:00" hostname="codespaces-27e95d"><testcase classname="tests" name="test_execute_validInput" time="0.001" /><testcase classname="tests" name="test_execute_invaldInput" time="0.001"><failure message="AssertionError: assert None == 'This Should Fail'&#10; +  where None = execute('l')">def test_execute_invaldInput(): # crashes program
+&gt;       assert execute('l') ==  "This Should Fail"
+E       AssertionError: assert None == 'This Should Fail'
+E        +  where None = execute('l')
+
+tests.py:12: AssertionError</failure></testcase></testsuite></testsuites>
