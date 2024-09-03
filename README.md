@@ -1,5 +1,5 @@
 ![Static Badge](https://img.shields.io/badge/Language-Python-yellow)
+![AutoPep8](https://img.shields.io/badge/AutoPep8-Formatted-yellow)
 ![Static Badge](https://img.shields.io/badge/Licence-MIT-blue)
 ![Static Badge](https://img.shields.io/badge/Platform-Linux-blue)
-![AutoPep8](https://img.shields.io/badge/autopep8-formatted-brightgreen)
 ![Workflow](https://github.com/Gunabana/CSC510/actions/workflows/python-app.yml/badge.svg)
