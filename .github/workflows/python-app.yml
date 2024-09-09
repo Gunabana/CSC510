@@ -72,11 +72,19 @@ jobs:
         else
           echo "::set-output name=radon_color::red"
         fi
-
     - name: Update Badges Dynamically using Shields.io
       uses: peter-evans/create-or-update-comment@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
         body: |
           ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint_score.outputs.score }}%2F10-${{ steps.pylint_score.outputs.color }})
           ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon_score.outputs.maintainability }}-${{ steps.radon_score.outputs.radon_color }})
+
+    # - name: Update Badges Dynamically using Shields.io
+    #   uses: peter-evans/create-or-update-comment@v2
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     body: |
+    #       ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint_score.outputs.score }}%2F10-${{ steps.pylint_score.outputs.color }})
+    #       ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon_score.outputs.maintainability }}-${{ steps.radon_score.outputs.radon_color }})
