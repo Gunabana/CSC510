@@ -40,6 +40,7 @@ jobs:
         pip install --upgrade setuptools
         pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         - name: Extract Pylint Score
+    - name: Extract Pylint Score
       id: pylint_score
       run: |
         pylint_score=$(grep "Your code has been rated" pylint_report.txt | awk '{print $7}' | cut -d'/' -f1)
