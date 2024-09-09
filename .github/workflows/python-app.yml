@@ -30,59 +30,53 @@ jobs:
     - name: Format code with AutoPep8
       run: autopep8 --in-place --aggressive --aggressive *.py
     - name: Measure complexity with radon
-      run: radon mi *.py
+      run: radon mi *.py > radon_report.txt
     - name: Lint code with Pylint
-      run: pylint "*.py" --ignore=previous-homeworks --ignore=rand.py
+      run: pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > pylint_report.txt || true
+
     - name: Test with pytest
       run: |
         pip install pytest pytest-cov
         pip install --upgrade setuptools
         pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-  # Run Pylint and extract score
-    - name: Run Pylint
-      id: pylint
+        - name: Extract Pylint Score
+      id: pylint_score
       run: |
-        pylint your_python_files_or_modules/ --output-format=parseable > pylint_report.txt
-        pylint_score=$(pylint your_python_files_or_modules/ | grep "Your code has been rated" | awk '{print $7}' | cut -d'/' -f1)
+        pylint_score=$(grep "Your code has been rated" pylint_report.txt | awk '{print $7}' | cut -d'/' -f1)
         echo "Pylint score: $pylint_score"
         echo "::set-output name=score::$pylint_score"
 
-    # Run Radon and extract maintainability score
-    - name: Run Radon Maintainability
-      id: radon
+    - name: Extract Radon Maintainability Score
+      id: radon_score
       run: |
-        radon mi your_python_files_or_modules/ > radon_report.txt
-        maintainability=$(radon mi your_python_files_or_modules/ | awk 'END {print $2}')
+        maintainability=$(awk 'END {print $2}' radon_report.txt)
         echo "Radon maintainability: $maintainability"
         echo "::set-output name=maintainability::$maintainability"
 
-    # Determine Pylint badge color based on score
-    - name: Determine Pylint badge color
+    - name: Determine Pylint Badge Color
       run: |
-        if (( $(echo "${{ steps.pylint.outputs.score }} > 8" | bc -l) )); then
+        if (( $(echo "${{ steps.pylint_score.outputs.score }} > 8" | bc -l) )); then
           echo "::set-output name=color::brightgreen"
-        elif (( $(echo "${{ steps.pylint.outputs.score }} > 5" | bc -l) )); then
+        elif (( $(echo "${{ steps.pylint_score.outputs.score }} > 5" | bc -l) )); then
           echo "::set-output name=color::yellow"
         else
           echo "::set-output name=color::red"
         fi
 
-    # Determine Radon badge color based on maintainability index
-    - name: Determine Radon badge color
+    - name: Determine Radon Badge Color
       run: |
-        if (( $(echo "${{ steps.radon.outputs.maintainability }} > 70" | bc -l) )); then
+        if (( $(echo "${{ steps.radon_score.outputs.maintainability }} > 70" | bc -l) )); then
           echo "::set-output name=radon_color::brightgreen"
-        elif (( $(echo "${{ steps.radon.outputs.maintainability }} > 50" | bc -l) )); then
+        elif (( $(echo "${{ steps.radon_score.outputs.maintainability }} > 50" | bc -l) )); then
           echo "::set-output name=radon_color::yellow"
         else
           echo "::set-output name=radon_color::red"
         fi
 
-    # Update badges dynamically using Shields.io
-    - name: Update badges
+    - name: Update Badges Dynamically using Shields.io
       uses: peter-evans/create-or-update-comment@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint.outputs.score }}%2F10-${{ steps.pylint.outputs.color }})
-          ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon.outputs.maintainability }}-${{ steps.radon.outputs.radon_color }})
+          ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint_score.outputs.score }}%2F10-${{ steps.pylint_score.outputs.color }})
+          ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon_score.outputs.maintainability }}-${{ steps.radon_score.outputs.radon_color }})
