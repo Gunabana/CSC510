@@ -39,7 +39,6 @@ jobs:
         pip install pytest pytest-cov
         pip install --upgrade setuptools
         pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-        - name: Extract Pylint Score
     - name: Extract Pylint Score
       id: pylint_score
       run: |
