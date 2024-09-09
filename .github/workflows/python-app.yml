@@ -38,3 +38,51 @@ jobs:
         pip install pytest pytest-cov
         pip install --upgrade setuptools
         pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+  # Run Pylint and extract score
+    - name: Run Pylint
+      id: pylint
+      run: |
+        pylint your_python_files_or_modules/ --output-format=parseable > pylint_report.txt
+        pylint_score=$(pylint your_python_files_or_modules/ | grep "Your code has been rated" | awk '{print $7}' | cut -d'/' -f1)
+        echo "Pylint score: $pylint_score"
+        echo "::set-output name=score::$pylint_score"
+
+    # Run Radon and extract maintainability score
+    - name: Run Radon Maintainability
+      id: radon
+      run: |
+        radon mi your_python_files_or_modules/ > radon_report.txt
+        maintainability=$(radon mi your_python_files_or_modules/ | awk 'END {print $2}')
+        echo "Radon maintainability: $maintainability"
+        echo "::set-output name=maintainability::$maintainability"
+
+    # Determine Pylint badge color based on score
+    - name: Determine Pylint badge color
+      run: |
+        if (( $(echo "${{ steps.pylint.outputs.score }} > 8" | bc -l) )); then
+          echo "::set-output name=color::brightgreen"
+        elif (( $(echo "${{ steps.pylint.outputs.score }} > 5" | bc -l) )); then
+          echo "::set-output name=color::yellow"
+        else
+          echo "::set-output name=color::red"
+        fi
+
+    # Determine Radon badge color based on maintainability index
+    - name: Determine Radon badge color
+      run: |
+        if (( $(echo "${{ steps.radon.outputs.maintainability }} > 70" | bc -l) )); then
+          echo "::set-output name=radon_color::brightgreen"
+        elif (( $(echo "${{ steps.radon.outputs.maintainability }} > 50" | bc -l) )); then
+          echo "::set-output name=radon_color::yellow"
+        else
+          echo "::set-output name=radon_color::red"
+        fi
+
+    # Update badges dynamically using Shields.io
+    - name: Update badges
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint.outputs.score }}%2F10-${{ steps.pylint.outputs.color }})
+          ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon.outputs.maintainability }}-${{ steps.radon.outputs.radon_color }})
