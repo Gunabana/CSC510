@@ -1,0 +1,1 @@
+https://img.shields.io/badge/maintainability-100.00-brightgreen
