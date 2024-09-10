@@ -5,7 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '*'
+
   pull_request:
     branches: [ "main" ]
 
@@ -21,16 +23,21 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.13.0-rc.1"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
     - name: Install autopep8, pylint, and radon
       run: pip install autopep8 pylint radon
+
     - name: Format code with AutoPep8
       run: autopep8 --in-place --aggressive --aggressive *.py
+
     - name: Measure complexity with radon
       run: radon mi *.py > radon_report.txt
+
     - name: Lint code with Pylint
       run: pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > pylint_report.txt || true
 
@@ -39,52 +46,33 @@ jobs:
         pip install pytest pytest-cov
         pip install --upgrade setuptools
         pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-    - name: Extract Pylint Score
-      id: pylint_score
-      run: |
-        pylint_score=$(grep "Your code has been rated" pylint_report.txt | awk '{print $7}' | cut -d'/' -f1)
-        echo "Pylint score: $pylint_score"
-        echo "::set-output name=score::$pylint_score"
 
-    - name: Extract Radon Maintainability Score
-      id: radon_score
+    - name: Generate Pylint badge
       run: |
-        maintainability=$(awk 'END {print $2}' radon_report.txt)
-        echo "Radon maintainability: $maintainability"
-        echo "::set-output name=maintainability::$maintainability"
+        # Extract the Pylint score from the pylint report
+        pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' pylint_report.txt)
+        pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
+        echo "Pylint badge URL: $pylint_badge"
+        echo "Pylint badge URL: $pylint_badge" > pylint_badge.txt
 
-    - name: Determine Pylint Badge Color
+    - name: Generate Radon badge
       run: |
-        if (( $(echo "${{ steps.pylint_score.outputs.score }} > 8" | bc -l) )); then
-          echo "::set-output name=color::brightgreen"
-        elif (( $(echo "${{ steps.pylint_score.outputs.score }} > 5" | bc -l) )); then
-          echo "::set-output name=color::yellow"
-        else
-          echo "::set-output name=color::red"
-        fi
+        # Extract the Radon maintainability score from the radon report
+        radon_score=$(grep -oP 'Maintainability: \K[0-9]+' radon_report.txt)
+        radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-brightgreen"
+        echo "Radon badge URL: $radon_badge"
+        echo "Radon badge URL: $radon_badge" > radon_badge.txt
 
-    - name: Determine Radon Badge Color
+    - name: Update README.md with badges
       run: |
-        if (( $(echo "${{ steps.radon_score.outputs.maintainability }} > 70" | bc -l) )); then
-          echo "::set-output name=radon_color::brightgreen"
-        elif (( $(echo "${{ steps.radon_score.outputs.maintainability }} > 50" | bc -l) )); then
-          echo "::set-output name=radon_color::yellow"
-        else
-          echo "::set-output name=radon_color::red"
-        fi
-    - name: Update Badges Dynamically using Shields.io
-      uses: peter-evans/create-or-update-comment@v2
+        pylint_badge=$(cat pylint_badge.txt)
+        radon_badge=$(cat radon_badge.txt)
+
+        sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
+        sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
+
+    - name: Commit updated README.md
+      uses: EndBug/add-and-commit@v9
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint_score.outputs.score }}%2F10-${{ steps.pylint_score.outputs.color }})
-          ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon_score.outputs.maintainability }}-${{ steps.radon_score.outputs.radon_color }})
-
-    # - name: Update Badges Dynamically using Shields.io
-    #   uses: peter-evans/create-or-update-comment@v2
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     body: |
-    #       ![Pylint Score](https://img.shields.io/badge/pylint-${{ steps.pylint_score.outputs.score }}%2F10-${{ steps.pylint_score.outputs.color }})
-    #       ![Radon Maintainability](https://img.shields.io/badge/maintainability-${{ steps.radon_score.outputs.maintainability }}-${{ steps.radon_score.outputs.radon_color }})
+        add: 'README.md'
+        message: 'Update Pylint and Radon badges'
