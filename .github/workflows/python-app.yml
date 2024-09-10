@@ -37,28 +37,31 @@ jobs:
       run: autopep8 --in-place --aggressive --aggressive *.py
 
     - name: Measure complexity with Radon
-      run: radon mi -s *.py > radon_report.txt
+      run: |
+        mkdir -p post_traces
+        radon mi -s *.py > post_traces/radon_report.txt
 
     - name: Lint code with Pylint
-      run: pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > pylint_report.txt || true
+      run: |
+        pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > post_traces/pylint_report.txt || true
 
     - name: Test with pytest
       run: |
         pip install pytest pytest-cov
         pip install --upgrade setuptools
-        pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        pytest --doctest-modules --junitxml=post_traces/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
     - name: Generate Pylint badge
       run: |
-        pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' pylint_report.txt)
+        pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' post_traces/pylint_report.txt)
         pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
         echo "$pylint_badge"
-        echo "$pylint_badge" > pylint_badge.txt
+        echo "$pylint_badge" > post_traces/pylint_badge.txt
 
     - name: Generate Radon badge
       run: |
         # Extract the highest Radon score from the report
-        radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
+        radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' post_traces/radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
         
         # Map the numerical score to badge color (example mapping)
         if (( $(echo "$radon_score >= 90" | bc -l) )); then
@@ -75,12 +78,12 @@ jobs:
         
         radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
         echo "$radon_badge"
-        echo "$radon_badge" > radon_badge.txt
+        echo "$radon_badge" > post_traces/radon_badge.txt
 
     - name: Update README.md with badges
       run: |
-        pylint_badge=$(cat pylint_badge.txt)
-        radon_badge=$(cat radon_badge.txt)
+        pylint_badge=$(cat post_traces/pylint_badge.txt)
+        radon_badge=$(cat post_traces/radon_badge.txt)
 
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
@@ -89,8 +92,6 @@ jobs:
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add README.md pylint_badge.txt radon_badge.txt pylint_report.txt radon_report.txt
-        git commit -am "Update Pylint and Radon badges"
+        git add README.md post_traces/pylint_badge.txt post_traces/radon_badge.txt post_traces/pylint_report.txt post_traces/radon_report.txt
+        git commit -m "Update Pylint and Radon badges" || echo "No changes to commit"
         git push
-        
-
