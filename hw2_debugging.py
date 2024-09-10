@@ -8,7 +8,7 @@ def merge_sort(arr):
     IN: arr - an array of values
     OUT: merged_arr - an updated, merged array
     """
-    if len(arr) == 1:
+    if len(arr) <= 1:
         return arr
 
     half = len(arr) // 2
