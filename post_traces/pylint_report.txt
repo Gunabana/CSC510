@@ -1,6 +1,4 @@
-************* Module hw2_debugging
-hw2_debugging.py:19:0: C0116: Missing function or method docstring (missing-function-docstring)
 
------------------------------------
-Your code has been rated at 9.66/10
+------------------------------------
+Your code has been rated at 10.00/10
 
