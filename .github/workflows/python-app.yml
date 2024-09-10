@@ -52,8 +52,8 @@ jobs:
       run: |
         pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' pylint_report.txt)
         pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
-        echo "Pylint badge URL: $pylint_badge"
-        echo "Pylint badge URL: $pylint_badge" > pylint_badge.txt
+        echo "$pylint_badge"
+        echo "$pylint_badge" > pylint_badge.txt
 
     - name: Generate Radon badge
       run: |
@@ -74,8 +74,8 @@ jobs:
         fi
         
         radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
-        echo "Radon badge URL: $radon_badge"
-        echo "Radon badge URL: $radon_badge" > radon_badge.txt
+        echo "$radon_badge"
+        echo "$radon_badge" > radon_badge.txt
 
     - name: Update README.md with badges
       run: |
