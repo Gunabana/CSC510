@@ -1,3 +1,3 @@
-hw2_debugging.py - A (81.87)
+hw2_debugging.py - A (82.20)
 rand.py - A (100.00)
 test_hw2_debugging.py - A (65.44)
