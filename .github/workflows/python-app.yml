@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - 'main'
-      - 'bbond/*'
+      - 'bbond/'
 
   pull_request:
     branches:
       - 'main'
-      - 'bbond/*'
+      - 'bbond/'
 
 permissions:
   contents: write
@@ -36,8 +36,8 @@ jobs:
     - name: Format code with AutoPep8
       run: autopep8 --in-place --aggressive --aggressive *.py
 
-    - name: Measure complexity with radon
-      run: radon mi *.py > radon_report.txt
+    - name: Measure complexity with Radon
+      run: radon mi -s *.py > radon_report.txt
 
     - name: Lint code with Pylint
       run: pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > pylint_report.txt || true
@@ -50,7 +50,6 @@ jobs:
 
     - name: Generate Pylint badge
       run: |
-        # Extract the Pylint score from the pylint report
         pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' pylint_report.txt)
         pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
         echo "Pylint badge URL: $pylint_badge"
@@ -58,9 +57,23 @@ jobs:
 
     - name: Generate Radon badge
       run: |
-        # Extract the Radon maintainability score from the radon report
-        radon_score=$(grep -oP 'Maintainability: \K[0-9]+' radon_report.txt)
-        radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-brightgreen"
+        # Extract the highest Radon score from the report
+        radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
+        
+        # Map the numerical score to badge color (example mapping)
+        if (( $(echo "$radon_score >= 90" | bc -l) )); then
+          radon_color="brightgreen"
+        elif (( $(echo "$radon_score >= 80" | bc -l) )); then
+          radon_color="yellowgreen"
+        elif (( $(echo "$radon_score >= 70" | bc -l) )); then
+          radon_color="yellow"
+        elif (( $(echo "$radon_score >= 60" | bc -l) )); then
+          radon_color="orange"
+        else
+          radon_color="red"
+        fi
+        
+        radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
         echo "Radon badge URL: $radon_badge"
         echo "Radon badge URL: $radon_badge" > radon_badge.txt
 
