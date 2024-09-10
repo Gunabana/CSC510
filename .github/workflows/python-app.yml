@@ -87,10 +87,9 @@ jobs:
 
     - name: Commit updated README.md
       run: |
-        git config advice.addIgnoredFile false
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add *
+        git add README.md pylint_badge.txt radon_badge.txt pylint_report.txt radon_report.txt
         git commit -am "Update Pylint and Radon badges"
         git push
         
