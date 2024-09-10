@@ -88,7 +88,7 @@ jobs:
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
 
-    - name: Commit updated README.md
+    - name: Commit updated README.md 
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
