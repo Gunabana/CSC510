@@ -17,12 +17,12 @@ def merge_sort(arr):
 
 
 def recombine(left_arr, right_arr):
-    # """
-    # A helper function to combine two arrays
-    # IN: left_arr - the left array to combine
-    # IN: right_arr - the right array to combine
-    # OUT: merge_arr - the merged array
-    # """
+    """
+    A helper function to combine two arrays
+    IN: left_arr - the left array to combine
+    IN: right_arr - the right array to combine
+    OUT: merge_arr - the merged array
+    """
     left_index = 0
     right_index = 0
     merge_arr = []
