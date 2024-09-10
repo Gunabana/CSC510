@@ -3,5 +3,5 @@
 ![Static Badge](https://img.shields.io/badge/Licence-MIT-blue)
 ![Static Badge](https://img.shields.io/badge/Platform-Linux-blue)
 ![Workflow](https://github.com/Gunabana/CSC510/actions/workflows/python-app.yml/badge.svg)
-![Pylint Score](https://img.shields.io/badge/pylint-0.0%2F10-brightgreen)
-![Radon Maintainability](https://img.shields.io/badge/maintainability-0-brightgreen)
+![Pylint](https://img.shields.io/badge/pylint-0.0%2F10-brightgreen)
+![Radon](https://img.shields.io/badge/radon-0-brightgreen)
