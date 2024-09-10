@@ -92,3 +92,5 @@ jobs:
         git add *
         git commit -am "Update Pylint and Radon badges"
         git push
+        git config advice.addIgnoredFile false
+
