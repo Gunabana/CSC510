@@ -1,4 +1,7 @@
+************* Module test_hw2_debugging
+test_hw2_debugging.py:21:0: C0116: Missing function or method docstring (missing-function-docstring)
+test_hw2_debugging.py:22:11: C1803: "merge_sort(...) == []" can be simplified to "not merge_sort(...)", if it is strictly a sequence, as an empty list is falsey (use-implicit-booleaness-not-comparison)
 
-------------------------------------
-Your code has been rated at 10.00/10
+-----------------------------------
+Your code has been rated at 9.35/10
 

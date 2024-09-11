@@ -14,7 +14,9 @@ def test_two_values():
 
 def test_long_array():
     """Test a long array"""
-    assert merge_sort([21, 48, 21, 2, 0, 4, -3, 100]) == [-3, 0, 2, 4, 21, 21, 48, 100]
+    assert merge_sort([21, 48, 21, 2, 0, 4, -3, 100]
+                      ) == [-3, 0, 2, 4, 21, 21, 48, 100]
+
 
 def empty_array():
-    assert merge_sort([])==[]
+    assert merge_sort([]) == []
