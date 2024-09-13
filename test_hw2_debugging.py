@@ -19,4 +19,5 @@ def test_long_array():
 
 
 def empty_array():
+    """Tests an empty array"""
     assert merge_sort([]) == []
