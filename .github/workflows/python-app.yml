@@ -89,14 +89,14 @@ jobs:
           issues_remaining=$(grep -oP '(?<=---> )[0-9]+' post_traces/autopep8_report.txt | sort -nr | head -n 1)
           if [ "$issues_remaining" -eq 0 ]; then
             echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
-            autopep8_status="success"
+            $autopep8_status="success"
           else
             echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
-            autopep8_status="failure"
+            $autopep8_status="failure"
           fi
         else
           echo "autopep8 did not produce expected report" > post_traces/autopep8_report.txt
-          autopep8_status="unknown"
+          $autopep8_status="unknown"
         fi
 
     - name: Generate autopep8 badge
