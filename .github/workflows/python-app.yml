@@ -78,7 +78,7 @@ jobs:
     - name: Run autopep8 and generate report
       id: autopep8_report
       run: |
-        autopep8 -i -v *.py > post_traces/autopep8_report.txt || true
+        autopep8 -i -v -r *.py > post_traces/autopep8_report.txt || true
 
     - name: Check autopep8 issues and generate report
       id: check_autopep8
