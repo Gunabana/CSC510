@@ -78,13 +78,13 @@ jobs:
     - name: Run autopep8 and generate report
       id: autopep8_report
       run: |
-        autopep8 -i -v *.py > post_traces/autopep8_output.txt || true
+        autopep8 -i -v *.py > post_traces/autopep8_report.txt || true
 
     - name: Check autopep8 issues and generate report
       id: check_autopep8
       run: |
-        if grep -q "issue(s) to fix" post_traces/autopep8_output.txt; then
-          issues_remaining=$(grep -oP '(?<=---> )[0-9]+' post_traces/autopep8_output.txt | sort -nr | head -n 1)
+        if grep -q "issue(s) to fix" post_traces/autopep8_report.txt; then
+          issues_remaining=$(grep -oP '(?<=---> )[0-9]+' post_traces/autopep8_report.txt | sort -nr | head -n 1)
           if [ "$issues_remaining" -eq 0 ]; then
             echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
             autopep8_status="success"
@@ -93,7 +93,7 @@ jobs:
             autopep8_status="failure"
           fi
         else
-          echo "autopep8 did not produce expected output" > post_traces/autopep8_report.txt
+          echo "autopep8 did not produce expected report" > post_traces/autopep8_report.txt
           autopep8_status="unknown"
         fi
 
