@@ -1,6 +1,4 @@
-************* Module test_hw2_debugging
-test_hw2_debugging.py:23:11: C1803: "merge_sort(...) == []" can be simplified to "not merge_sort(...)", if it is strictly a sequence, as an empty list is falsey (use-implicit-booleaness-not-comparison)
 
------------------------------------
-Your code has been rated at 9.68/10
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 
