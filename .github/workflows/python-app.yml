@@ -33,9 +33,6 @@ jobs:
     - name: Install autopep8, pylint, and radon
       run: pip install autopep8 pylint radon
 
-    - name: Format code with AutoPep8
-      run: autopep8 --in-place --aggressive --aggressive *.py
-
     - name: Measure complexity with Radon
       run: |
         mkdir -p post_traces
@@ -60,10 +57,8 @@ jobs:
 
     - name: Generate Radon badge
       run: |
-        # Extract the highest Radon score from the report
         radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' post_traces/radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
         
-        # Map the numerical score to badge color (example mapping)
         if (( $(echo "$radon_score >= 90" | bc -l) )); then
           radon_color="brightgreen"
         elif (( $(echo "$radon_score >= 80" | bc -l) )); then
@@ -79,24 +74,45 @@ jobs:
         radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
         echo "$radon_badge"
         echo "$radon_badge" > post_traces/radon_badge.txt
-    
-    - name: Generate AutoPep8 badge
-      run: |
-        autopep8 --diff *.py > post_traces/autopep8_diff.txt
-        autopep8_changes=$(grep -c '^\+' post_traces/autopep8_diff.txt || echo 0)
 
-        # Set badge color based on whether changes were made or not
-        if [[ "$autopep8_changes" -eq 0 ]]; then
-            autopep8_label="Formatted"
-            autopep8_color="brightgreen"
+    - name: Run autopep8 and generate report
+      id: autopep8_report
+      run: |
+        autopep8 -i -v *.py > post_traces/autopep8_output.txt || true
+
+    - name: Check autopep8 issues and generate report
+      id: check_autopep8
+      run: |
+        if grep -q "issue(s) to fix" post_traces/autopep8_output.txt; then
+          issues_remaining=$(grep -oP '(?<=---> )[0-9]+' post_traces/autopep8_output.txt | sort -nr | head -n 1)
+          if [ "$issues_remaining" -eq 0 ]; then
+            echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
+            autopep8_status="success"
+          else
+            echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
+            autopep8_status="failure"
+          fi
         else
-            autopep8_label="Not Formatted"
-            autopep8_color="red"
+          echo "autopep8 did not produce expected output" > post_traces/autopep8_report.txt
+          autopep8_status="unknown"
         fi
 
-        autopep8_badge="https://img.shields.io/badge/AutoPep8-${autopep8_label}-${autopep8_color}"
-        echo "$autopep8_badge"
-        echo "$autopep8_badge" > post_traces/autopep8_badge.txt
+    - name: Generate autopep8 badge
+      run: |
+        if [ "$autopep8_status" = "success" ]; then
+          badge_color="brightgreen"
+          badge_message="autopep8 formatted"
+        elif [ "$autopep8_status" = "failure" ]; then
+          badge_color="red"
+          badge_message="not autopep8 formatted"
+        else
+          badge_color="lightgrey"
+          badge_message="autopep8 status unknown"
+        fi
+
+        badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
+        echo "$badge_url"
+        echo "$badge_url" > post_traces/autopep8_badge.txt
 
     - name: Update README.md with badges
       run: |
@@ -106,15 +122,13 @@ jobs:
 
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
-        # sed -i "s|!\[AutoPep8\](https://img.shields.io/badge/autopep8-.*)|![AutoPep8](${autopep8_badge})|g" README.md || \
-        # echo "![AutoPep8](${autopep8_badge})" >> README.md
-        sed -i "s|!\[AutoPep8\](https://img.shields.io/badge/AutoPep8-.*)|![AutoPep8](${autopep8_badge})|g" README.md
+        sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md || true
 
 
     - name: Commit updated README.md 
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add README.md post_traces/pylint_badge.txt post_traces/radon_badge.txt post_traces/autopep8_badge.txt post_traces/pylint_report.txt post_traces/radon_report.txt
-        git commit -am "Update Pylint, Radon, and AutoPep8 badges" || echo "No changes to commit" 
+        git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt
+        git commit -am "Update autopep8 badge" || echo "No changes to commit"
         git push
