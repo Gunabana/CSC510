@@ -100,6 +100,7 @@ jobs:
         fi
         
         autopep8_badge="https://img.shields.io/badge/autopep8-${autopep8_changes}_changes-${autopep8_color}"
+
         echo "$autopep8_badge"
         echo "$autopep8_badge" > post_traces/autopep8_badge.txt
 
