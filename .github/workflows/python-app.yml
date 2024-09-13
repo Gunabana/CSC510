@@ -111,7 +111,8 @@ jobs:
 
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
-        sed -i "s|!\[AutoPep8\](https://img.shields.io/badge/AutoPep8-.*)|![AutoPep8](${autopep8_badge})|g" README.md
+        sed -i "s|!\[AutoPep8\](https://img.shields.io/badge/autopep8-.*)|![AutoPep8](${autopep8_badge})|g" README.md || \
+        echo "![AutoPep8](${autopep8_badge})" >> README.md
 
 
     - name: Commit updated README.md 
