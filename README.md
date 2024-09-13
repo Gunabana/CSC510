@@ -6,3 +6,5 @@
 ![Pylint Score](https://img.shields.io/badge/pylint-9.35/10-brightgreen)
 ![Radon Maintainability](https://img.shields.io/badge/maintainability-100.00-brightgreen)
 
+![AutoPep8](https://img.shields.io/badge/autopep8-0
+0_changes-red)
