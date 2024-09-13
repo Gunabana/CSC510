@@ -82,7 +82,7 @@ jobs:
         autopep8 -i -v -r *.py > post_traces/autopep8_report.txt 2>&1 || true
 
 
-    - name: Check autopep8 issues and generate report
+    - name: Check autopep8 issues, generate report, and create badge
       id: check_autopep8
       run: |
         if grep -q "issue(s) to fix" post_traces/autopep8_report.txt; then
@@ -107,25 +107,6 @@ jobs:
         badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
         echo "$badge_url"
         echo "$badge_url" > post_traces/autopep8_badge.txt
-
-    # - name: Generate autopep8 badge
-    #   run: |
-    #     # Determine badge status based on autopep8_status
-    #     if [ "$autopep8_status" = "success" ]; then
-    #       badge_color="brightgreen"
-    #       badge_message="autopep8-formatted"
-    #     elif [ "$autopep8_status" = "failure" ]; then
-    #       badge_color="red"
-    #       badge_message="autopep8-not_formatted"
-    #     else
-    #       badge_color="lightgrey"
-    #       badge_message="autopep8-status_unknown"
-    #     fi
-    
-    #     # Construct badge URL
-    #     badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
-    #     echo "$badge_url"
-    #     echo "$badge_url" > post_traces/autopep8_badge.txt
       
     - name: Update README.md with badges
       run: |
