@@ -112,7 +112,7 @@ jobs:
           badge_message="status_unknown"
         fi
 
-        badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
+        badge_url="https://img.shields.io/badge/$autopep8-{badge_message}-${badge_color}"
         echo "$badge_url"
         echo "$badge_url" > post_traces/autopep8_badge.txt
 
