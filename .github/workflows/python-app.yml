@@ -101,13 +101,13 @@ jobs:
       run: |
         if [ "$autopep8_status" = "success" ]; then
           badge_color="brightgreen"
-          badge_message="autopep8 formatted"
+          badge_message="autopep8-formatted"
         elif [ "$autopep8_status" = "failure" ]; then
           badge_color="red"
-          badge_message="not autopep8 formatted"
+          badge_message="autopep8-not_formatted"
         else
           badge_color="lightgrey"
-          badge_message="autopep8 status unknown"
+          badge_message="autopep8-status_unknown"
         fi
 
         badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
