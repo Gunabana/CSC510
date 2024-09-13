@@ -1,7 +1,6 @@
-[file:rand.py]
---->  0 issue(s) to fix {}
 [file:hw2_debugging.py]
 --->  0 issue(s) to fix {}
+[file:rand.py]
+--->  0 issue(s) to fix {}
 [file:test_hw2_debugging.py]
---->  2 issue(s) to fix {'E201': {21}, 'E202': {21}}
 --->  0 issue(s) to fix {}
