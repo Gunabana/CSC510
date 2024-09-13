@@ -89,35 +89,43 @@ jobs:
         issues_remaining=$(grep -oP '\d+(?= issue\(s\) to fix)' post_traces/autopep8_report.txt | sort -nr | head -n 1)
         if [ "$issues_remaining" -eq 0 ]; then
             echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
-            autopep8_status="success"
+            badge_color="brightgreen"
+            badge_message="autopep8-formatted"
           else
             echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
             autopep8_status="failure"
+            badge_color="red"
+            badge_message="autopep8-not_formatted"
           fi
         else
           echo "autopep8 did not produce expected report" > post_traces/autopep8_report.txt
           autopep8_status="unknown"
-        fi
-        echo $autopep8_status
-
-    - name: Generate autopep8 badge
-      run: |
-        # Determine badge status based on autopep8_status
-        if [ "$autopep8_status" = "success" ]; then
-          badge_color="brightgreen"
-          badge_message="autopep8-formatted"
-        elif [ "$autopep8_status" = "failure" ]; then
-          badge_color="red"
-          badge_message="autopep8-not_formatted"
-        else
           badge_color="lightgrey"
           badge_message="autopep8-status_unknown"
         fi
-    
-        # Construct badge URL
+
         badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
         echo "$badge_url"
         echo "$badge_url" > post_traces/autopep8_badge.txt
+
+    # - name: Generate autopep8 badge
+    #   run: |
+    #     # Determine badge status based on autopep8_status
+    #     if [ "$autopep8_status" = "success" ]; then
+    #       badge_color="brightgreen"
+    #       badge_message="autopep8-formatted"
+    #     elif [ "$autopep8_status" = "failure" ]; then
+    #       badge_color="red"
+    #       badge_message="autopep8-not_formatted"
+    #     else
+    #       badge_color="lightgrey"
+    #       badge_message="autopep8-status_unknown"
+    #     fi
+    
+    #     # Construct badge URL
+    #     badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
+    #     echo "$badge_url"
+    #     echo "$badge_url" > post_traces/autopep8_badge.txt
       
     - name: Update README.md with badges
       run: |
