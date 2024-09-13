@@ -79,19 +79,45 @@ jobs:
         radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
         echo "$radon_badge"
         echo "$radon_badge" > post_traces/radon_badge.txt
+    
+    - name: Generate AutoPep8 badge
+      run: |
+        # Create diff report and count changes made by AutoPep8
+        autopep8 --diff *.py > post_traces/autopep8_diff.txt
+        autopep8_changes=$(grep -c '^\+' post_traces/autopep8_diff.txt || echo 0)
+        
+        # Map number of changes to badge color
+        if (( autopep8_changes == 0 )); then
+          autopep8_color="brightgreen"
+        elif (( autopep8_changes <= 10 )); then
+          autopep8_color="yellowgreen"
+        elif (( autopep8_changes <= 50 )); then
+          autopep8_color="yellow"
+        elif (( autopep8_changes <= 100 )); then
+          autopep8_color="orange"
+        else
+          autopep8_color="red"
+        fi
+        
+        autopep8_badge="https://img.shields.io/badge/autopep8-${autopep8_changes}_changes-${autopep8_color}"
+        echo "$autopep8_badge"
+        echo "$autopep8_badge" > post_traces/autopep8_badge.txt
 
     - name: Update README.md with badges
       run: |
         pylint_badge=$(cat post_traces/pylint_badge.txt)
         radon_badge=$(cat post_traces/radon_badge.txt)
+        autopep8_badge=$(cat post_traces/autopep8_badge.txt)
 
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
+        sed -i "s|!\[AutoPep8\](https://img.shields.io/badge/autopep8-.*)|![AutoPep8](${autopep8_badge})|g" README.md || \
+        echo "![AutoPep8](${autopep8_badge})" >> README.md
 
     - name: Commit updated README.md 
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git add README.md post_traces/pylint_badge.txt post_traces/radon_badge.txt post_traces/pylint_report.txt post_traces/radon_report.txt
-        git commit -am "Update Pylint and Radon badges" || echo "No changes to commit"
+        git add README.md post_traces/pylint_badge.txt post_traces/radon_badge.txt post_traces/autopep8_badge.txt post_traces/pylint_report.txt post_traces/radon_report.txt
+        git commit -am "Update Pylint, Radon, and AutoPep8 badges" || echo "No changes to commit" 
         git push
