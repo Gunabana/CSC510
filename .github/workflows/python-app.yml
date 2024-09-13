@@ -5,7 +5,6 @@ on:
     branches:
       - 'main'
       - 'bbond/'
-      
   pull_request:
     branches:
       - 'main'
@@ -83,18 +82,25 @@ jobs:
     - name: Check autopep8 issues and generate report
       id: check_autopep8
       run: |
-        if grep -q "issue(s) to fix" post_traces/autopep8_report.txt; then
-          issues_remaining=$(grep -oP '(?<=---> )[0-9]+' post_traces/autopep8_report.txt | sort -nr | head -n 1)
-          if [ "$issues_remaining" -eq 0 ]; then
-            echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
-            autopep8_status="success"
-          else
-            echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
-            autopep8_status="failure"
+        # Check the last line for each file section
+        all_zero_issues=true
+        while IFS= read -r line; do
+          if [[ "$line" =~ ^\[\file: ]]; then
+            current_file_section=$line
+          elif [[ "$line" =~ issue\(s\) to fix ]]; then
+            issues_remaining=$(echo "$line" | grep -oP '(?<=---> )[0-9]+')
+            if [[ "$issues_remaining" -ne 0 ]]; then
+              all_zero_issues=false
+            fi
           fi
+        done < post_traces/autopep8_report.txt
+
+        if $all_zero_issues; then
+          echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
+          autopep8_status="success"
         else
-          echo "autopep8 did not produce expected report" > post_traces/autopep8_report.txt
-          autopep8_status="unknown"
+          echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
+          autopep8_status="failure"
         fi
 
     - name: Generate autopep8 badge
@@ -123,7 +129,6 @@ jobs:
         sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
         sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
         sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md || true
-
 
     - name: Commit updated README.md 
       run: |
