@@ -151,7 +151,7 @@ jobs:
           name: pylint-badge
       - name: Update README.md with badges
         run: |
-          pylint_badge=$(cat post_traces/pylint_badge.txt)
+          pylint_badge=$(cat pylint_badge.txt)
           echo $pylint_badge
           radon_badge=$(cat post_traces/radon_badge.txt)
           autopep8_badge=$(cat post_traces/autopep8_badge.txt)
