@@ -87,6 +87,7 @@ jobs:
           pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' post_traces/pylint_report.txt)
           pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
           echo "$pylint_badge" > post_traces/pylint_badge.txt
+          echo $pylint_badge
       - name: Upload Pylint badge
         uses: actions/upload-artifact@v3
         with:
