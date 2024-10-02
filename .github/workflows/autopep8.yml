@@ -13,12 +13,22 @@ on:
 
 permissions:
   contents: write
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.13.0-rc.1"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Install autopep8
       run: pip install autopep8
@@ -28,3 +38,45 @@ jobs:
       run: |
         autopep8 -i -v -r *.py > post_traces/autopep8_report.txt 2>&1 || true
         autopep8 -i -v -r *.py > post_traces/autopep8_report.txt 2>&1 || true
+
+    - name: Check autopep8 issues, generate report, and create badge
+      id: check_autopep8
+      run: |
+        if grep -q "issue(s) to fix" post_traces/autopep8_report.txt; then
+        issues_remaining=$(grep -oP '\d+(?= issue\(s\) to fix)' post_traces/autopep8_report.txt | sort -nr | head -n 1)
+        if [ "$issues_remaining" -eq 0 ]; then
+            echo "All files are autopep8 formatted" > post_traces/autopep8_report.txt
+            badge_color="brightgreen"
+            badge_message="autopep8-formatted"
+          else
+            echo "Not all files are autopep8 formatted" > post_traces/autopep8_report.txt
+            autopep8_status="failure"
+            badge_color="red"
+            badge_message="autopep8-not_formatted"
+          fi
+        else
+          echo "autopep8 did not produce expected report" > post_traces/autopep8_report.txt
+          autopep8_status="unknown"
+          badge_color="lightgrey"
+          badge_message="autopep8-status_unknown"
+        fi
+
+        badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
+        echo "$badge_url"
+        echo "$badge_url" > post_traces/autopep8_badge.txt
+
+    - name: Update README.md with badges
+      run: |
+        # Read badge URLs from files
+        autopep8_badge=$(cat post_traces/autopep8_badge.txt)
+    
+        # Update README.md with the latest badges
+        sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md || true
+
+    - name: Commit updated README.md 
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt
+        git commit -am "Update autopep8 badge" || echo "No changes to commit"
+        git push
