@@ -27,58 +27,6 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-  lint:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.13.0-rc.1"
-      - name: Install pylint
-        run: pip install pylint
-      - name: Lint code with Pylint
-        run: |
-          pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > post_traces/pylint_report.txt || true
-      - name: Generate Pylint badge
-        run: |
-          pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' post_traces/pylint_report.txt)
-          pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
-          echo "$pylint_badge" > post_traces/pylint_badge.txt
-
-  radon:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.13.0-rc.1"
-      - name: Install radon
-        run: pip install radon
-      - name: Measure complexity with Radon
-        run: |
-          mkdir -p post_traces
-          radon mi -s *.py > post_traces/radon_report.txt
-      - name: Generate Radon badge
-        run: |
-          radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' post_traces/radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
-          if (( $(echo "$radon_score >= 90" | bc -l) )); then
-            radon_color="brightgreen"
-          elif (( $(echo "$radon_score >= 80" | bc -l) )); then
-            radon_color="yellowgreen"
-          elif (( $(echo "$radon_score >= 70" | bc -l) )); then
-            radon_color="yellow"
-          elif (( $(echo "$radon_score >= 60" | bc -l) )); then
-            radon_color="orange"
-          else
-            radon_color="red"
-          fi
-          radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
-          echo "$radon_badge" > post_traces/radon_badge.txt
-
   autopep8:
     runs-on: ubuntu-latest
     needs: build
@@ -120,6 +68,57 @@ jobs:
           badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
           echo "$badge_url" > post_traces/autopep8_badge.txt
 
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.13.0-rc.1"
+      - name: Install pylint
+        run: pip install pylint
+      - name: Lint code with Pylint
+        run: |
+          pylint "*.py" --ignore=previous-homeworks --ignore=rand.py > post_traces/pylint_report.txt || true
+      - name: Generate Pylint badge
+        run: |
+          pylint_score=$(grep -oP 'Your code has been rated at \K[0-9.]+\/10' post_traces/pylint_report.txt)
+          pylint_badge="https://img.shields.io/badge/pylint-${pylint_score}-brightgreen"
+          echo "$pylint_badge" > post_traces/pylint_badge.txt
+
+  radon:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.13.0-rc.1"
+      - name: Install radon
+        run: pip install radon
+      - name: Measure complexity with Radon
+        run: |
+          radon mi -s *.py > post_traces/radon_report.txt || true
+      - name: Generate Radon badge
+        run: |
+          radon_score=$(grep -oP '\([0-9]+\.[0-9]+\)' post_traces/radon_report.txt | sed 's/[()]//g' | sort -nr | head -n 1)
+          if (( $(echo "$radon_score >= 90" | bc -l) )); then
+            radon_color="brightgreen"
+          elif (( $(echo "$radon_score >= 80" | bc -l) )); then
+            radon_color="yellowgreen"
+          elif (( $(echo "$radon_score >= 70" | bc -l) )); then
+            radon_color="yellow"
+          elif (( $(echo "$radon_score >= 60" | bc -l) )); then
+            radon_color="orange"
+          else
+            radon_color="red"
+          fi
+          radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
+          echo "$radon_badge" > post_traces/radon_badge.txt
+
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -153,6 +152,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt
+          git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt post_traces/pylint_badge.txt post_traces/pylint_report.txt post_traces/radonn_report.txt post_traces/radon_badge.txt
           git commit -m "Update badges" || echo "No changes to commit"
           git push
