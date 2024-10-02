@@ -70,7 +70,7 @@ jobs:
       - name: Upload autopep8 badge
         uses: actions/upload-artifact@v3
         with:
-          name: autpep8-badge
+          name: autopep8-badge
           path: post_traces/autopep8_badge.txt
 
   lint:
