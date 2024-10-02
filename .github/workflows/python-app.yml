@@ -144,9 +144,9 @@ jobs:
           pylint_badge=$(cat post_traces/pylint_badge.txt)
           radon_badge=$(cat post_traces/radon_badge.txt)
           autopep8_badge=$(cat post_traces/autopep8_badge.txt)
-          sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md || true
-          sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md || true
-          sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md || true
+          sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
+          sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
+          sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md
 
       - name: Commit updated README.md 
         run: |
