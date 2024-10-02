@@ -67,6 +67,11 @@ jobs:
           fi
           badge_url="https://img.shields.io/badge/${badge_message}-${badge_color}"
           echo "$badge_url" > post_traces/autopep8_badge.txt
+      - name: Upload autopep8 badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: autpep8-badge
+          path: post_traces/autopep8_badge.txt
 
   lint:
     runs-on: ubuntu-latest
@@ -124,6 +129,11 @@ jobs:
           fi
           radon_badge="https://img.shields.io/badge/maintainability-${radon_score}-${radon_color}"
           echo "$radon_badge" > post_traces/radon_badge.txt
+      - name: Upload Radon badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: radon-badge
+          path: post_traces/radon_badge.txt
 
   test:
     runs-on: ubuntu-latest
@@ -145,16 +155,23 @@ jobs:
     needs: [lint, radon, autopep8]
     steps:
       - uses: actions/checkout@v4
+      - name: Download autopep8 badge
+        uses: actions/download-artifact@v3
+        with:
+          name: autopep8-badge
       - name: Download Pylint badge
         uses: actions/download-artifact@v3
         with:
           name: pylint-badge
+      - name: Download radon badge
+        uses: actions/download-artifact@v3
+        with:
+          name: radon-badge
       - name: Update README.md with badges
         run: |
           pylint_badge=$(cat pylint_badge.txt)
-          echo $pylint_badge
-          radon_badge=$(cat post_traces/radon_badge.txt)
-          autopep8_badge=$(cat post_traces/autopep8_badge.txt)
+          radon_badge=$(cat radon_badge.txt)
+          autopep8_badge=$(cat autopep8_badge.txt)
           sed -i "s|!\[Pylint Score\](https://img.shields.io/badge/pylint-.*)|![Pylint Score](${pylint_badge})|g" README.md
           sed -i "s|!\[Radon Maintainability\](https://img.shields.io/badge/maintainability-.*)|![Radon Maintainability](${radon_badge})|g" README.md
           sed -i "s|!\[autopep8 Status\](https://img.shields.io/badge/autopep8-.*)|![autopep8 Status](${autopep8_badge})|g" README.md
