@@ -152,6 +152,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt post_traces/pylint_badge.txt post_traces/pylint_report.txt post_traces/radonn_report.txt post_traces/radon_badge.txt
+          git add README.md post_traces/autopep8_badge.txt post_traces/autopep8_report.txt post_traces/pylint_badge.txt post_traces/pylint_report.txt post_traces/radon_report.txt post_traces/radon_badge.txt
           git commit -m "Update badges" || echo "No changes to commit"
           git push
