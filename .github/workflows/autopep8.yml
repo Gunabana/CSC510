@@ -1,0 +1,30 @@
+name: autopep8 formatting
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'bbond/'
+      
+  pull_request:
+    branches:
+      - 'main'
+      - 'bbond/'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install autopep8
+      run: pip install autopep8
+    
+    - name: Run autopep8 and generate report
+      id: autopep8_report
+      run: |
+        autopep8 -i -v -r *.py > post_traces/autopep8_report.txt 2>&1 || true
+        autopep8 -i -v -r *.py > post_traces/autopep8_report.txt 2>&1 || true
